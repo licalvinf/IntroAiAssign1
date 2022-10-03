@@ -20,8 +20,8 @@ class Grid:
             obstacles[wall[0]][wall[1]] = 1
             
         #Chooses random placements for start and end
-        startpoint = (random.randint(0,149), random.randint(0,149))
-        endpoint = (random.randint(0,149), random.randint(0,149))
+        startpoint = (random.randint(0,150), random.randint(0,150))
+        endpoint = (random.randint(0,150), random.randint(0,150))
         
         
 def a_Star:
