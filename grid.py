@@ -1,5 +1,6 @@
 from itertools import product
 from random import sample
+from heapq import heappop, heappush, heapify
 import numpy
 import math
 
@@ -26,15 +27,25 @@ class Grid:
         
 def a_Star:
     #Sets up the heuristic for all points - initially set to inf
-        self.heuristic = [[numpy.inf for x in range(rows)] for y in range(cols)]
+        heuristic = [[numpy.inf for x in range(rows)] for y in range(cols)]
         
         #Sets up array of tuples to track parents
-        self.parents = [[(numpy.inf, numpy.inf) for x in range(rows)] for y in range(cols)]
+        parents = [[(numpy.inf, numpy.inf) for x in range(rows)] for y in range(cols)]
         
         #g is used to notate the distance from start to point
-        self.g =  [[numpy.inf for x in range(rows)] for y in range(cols)]
+        g =  [[numpy.inf for x in range(rows)] for y in range(cols)]
         
-        
+        #visited is used to close off nodes that are already visited
+        #0 is new, 1 is visited
+        visited = [[0 for x in range(rows)] for y in range(cols)]
+
+	#fringe holds the next node to visit based off of f
+	#f is g + heuristic
+	#heapq from Python library is min heap by default, so values need to be multiplied by -1
+	fringe = []
+	heapify(fringe)
+
+	dowhile(fringe[0] is not None)
  
 #Comparitive method to use in binary heap
 #Allows tuples to be placed in the heap and compared by their 
