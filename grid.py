@@ -65,7 +65,8 @@ class Grid:
         parent.update({startpoint:startpoint})
         h = self.a_Star_Heuristic(startpoint, endpoint)
         heuristic.update({startpoint:h})
-        heappush(fringe,startpoint)
+        fringeDict.update({startpoint: g.get(startpoint) + heuristic.get(startpoint)})
+        heappush(fringe,(fringeDict.get(startpoint),startpoint[0],startpoint[1]))
         print(startpoint)
         print(endpoint)
         for row in obstacles:
@@ -73,12 +74,13 @@ class Grid:
         fringeDict.update({startpoint: g.get(startpoint) + heuristic.get(startpoint)})
         while(len(fringe) is not 0):
             currentpoint = heappop(fringe)
+            currentpoint = (currentpoint[1],currentpoint[2])
             print(currentpoint)
             if (currentpoint == endpoint):
                 point = endpoint
                 lst = [endpoint]
                 print("Path is:")
-                while (point is not startpoint):
+                while (parent.get(point) is not startpoint):
                     lst.insert(0,parent.get(point))
                     point = parent.get(point)
                 for x in lst:
@@ -101,10 +103,13 @@ class Grid:
                                     g.update({checkpoint: g.get(currentpoint)+math.sqrt(2)})
                                     parent.update({checkpoint: currentpoint})
                                     if fringeDict.get(checkpoint) is not None:
-                                        fringe.remove(checkpoint)
-                                    heappush(fringe, checkpoint)
+                                        fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                        heapify(fringe)
                                     heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                     fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                                    checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                    heappush(fringe, checkpoint)
+                                    
 
                     if (currentpoint[0] + 1) <= len(obstacles[0]): #Check the point diagonally up right
                       checkpoint = (currentpoint[0]+1, currentpoint[1]-1)
@@ -118,10 +123,12 @@ class Grid:
                                     g.update({checkpoint: g.get(currentpoint)+math.sqrt(2)})
                                     parent.update({checkpoint: currentpoint})
                                     if fringeDict.get(checkpoint) is not None:
-                                        fringe.remove(checkpoint)
-                                    heappush(fringe, checkpoint)
+                                        fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                        heapify(fringe)
                                     heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                     fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                                    checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                    heappush(fringe, checkpoint)
     
                     checkpoint = (currentpoint[0], currentpoint[1]-1) #Check the point directly above
                     print("Up:{}".format(checkpoint))
@@ -134,10 +141,12 @@ class Grid:
                                     g.update({checkpoint: g.get(currentpoint)+ 1})
                                     parent.update({checkpoint: currentpoint})
                                     if fringeDict.get(checkpoint) is not None:
-                                        fringe.remove(checkpoint)
-                                    heappush(fringe, checkpoint)
+                                        fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                        heapify(fringe)
                                     heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                     fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                                    checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                    heappush(fringe, checkpoint)
 
                 if (currentpoint[1] + 1 <= len(obstacles)): #Check the points below the current point
                     if (currentpoint[0] - 1 >= 0): #Check point diagonally down left
@@ -152,10 +161,12 @@ class Grid:
                                     g.update({checkpoint: g.get(currentpoint)+math.sqrt(2)})
                                     parent.update({checkpoint: currentpoint})
                                     if fringeDict.get(checkpoint) is not None:
-                                        fringe.remove(checkpoint)
-                                    heappush(fringe, checkpoint)
+                                        fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                        heapify(fringe)
                                     heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                     fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                                    checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                    heappush(fringe, checkpoint)
 
                     if (currentpoint[0] + 1 <= len(obstacles[0])): #Check point diagonally down right
                         checkpoint = (currentpoint[0]+1, currentpoint[1]+1)
@@ -169,10 +180,12 @@ class Grid:
                                     g.update({checkpoint: g.get(currentpoint)+math.sqrt(2)})
                                     parent.update({checkpoint: currentpoint})
                                     if fringeDict.get(checkpoint) is not None:
-                                        fringe.remove(checkpoint)
-                                    heappush(fringe, checkpoint)
+                                        fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                        heapify(fringe)
                                     heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                     fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                                    checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                    heappush(fringe, checkpoint)
                     
                     checkpoint = (currentpoint[0], currentpoint[1]+1) #Check the point directly below
                     print("Down:{}".format(checkpoint))
@@ -185,10 +198,12 @@ class Grid:
                                 g.update({checkpoint: g.get(currentpoint) + 1})
                                 parent.update({checkpoint: currentpoint})
                                 if fringeDict.get(checkpoint) is not None:
-                                    fringe.remove(checkpoint)
-                                heappush(fringe, checkpoint)
+                                    fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                    heapify(fringe)
                                 heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                 fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                                checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                heappush(fringe, checkpoint)
 
                     checkpoint = (currentpoint[0]-1, currentpoint[1]) #Check the point to the left
                     print("Left:{}".format(checkpoint))
@@ -202,10 +217,12 @@ class Grid:
                                 g.update({checkpoint: g.get(currentpoint) + 1})
                                 parent.update({checkpoint: currentpoint})
                                 if fringeDict.get(checkpoint) is not None:
-                                    fringe.remove(checkpoint)
-                                heappush(fringe, checkpoint)
+                                    fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                    heapify(fringe)
                                 heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                 fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                                checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                heappush(fringe, checkpoint)
                     
                     checkpoint = (currentpoint[0], currentpoint[1] + 1) #Check the point to the right
                     print("Right:{}".format(checkpoint))
@@ -219,19 +236,12 @@ class Grid:
                                 g.update({checkpoint: g.get(currentpoint) + 1})
                                 parent.update({checkpoint: currentpoint})
                                 if fringeDict.get(checkpoint) is not None:
-                                    fringe.remove(checkpoint)
-                                heappush(fringe, checkpoint)
+                                    fringe.remove((fringeDict.get(checkpoint), checkpoint[0], checkpoint[1]))
+                                    heapify(fringe)
                                 heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                 fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
-
-        
-
- 
-    #Comparitive method to use in binary heap
-    #Allows pairs to be placed in the heap and compared by their value in the fringe
-    def __lt__(self, other):
-        return fringeDict.get(self) > fringeDict.get(other)
-    
+                                checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
+                                heappush(fringe, checkpoint)
 
 def main():
     grid = Grid(5,5)
