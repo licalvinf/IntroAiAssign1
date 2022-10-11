@@ -68,16 +68,30 @@ class Grid:
         heappush(fringe,startpoint)
         print(startpoint)
         print(endpoint)
+        for row in obstacles:
+          print(row)
         fringeDict.update({startpoint: g.get(startpoint) + heuristic.get(startpoint)})
         while(len(fringe) is not 0):
             currentpoint = heappop(fringe)
+            print(currentpoint)
             if (currentpoint == endpoint):
+                point = endpoint
+                lst = [endpoint]
+                print("Path is:")
+                while (point is not startpoint):
+                    lst.insert(0,parent.get(point))
+                    point = parent.get(point)
+                for x in lst:
+                        print(x)
+                for key,value in fringeDict.items():
+                        print(key,value)
                 return "Path found"
             else:
                 closed.add(currentpoint)
                 if (currentpoint[1] - 1 >= 0): #Check the points above the current point
                     if (currentpoint[0] - 1 >= 0): #Check point diagonally up left
                         checkpoint = (currentpoint[0]-1, currentpoint[1]-1)
+                        print("Up Left:{}".format(checkpoint))
                         if (obstacles[currentpoint[0]-1][currentpoint[1]-1] == 0): #Check if path is clear
                             if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
@@ -94,6 +108,7 @@ class Grid:
 
                     if (currentpoint[0] + 1) <= len(obstacles[0]): #Check the point diagonally up right
                       checkpoint = (currentpoint[0]+1, currentpoint[1]-1)
+                      print("Up Right:{}".format(checkpoint))
                       if (obstacles[currentpoint[0]][currentpoint[1]-1] == 0): #Check if path is clear
                             if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
@@ -107,9 +122,28 @@ class Grid:
                                     heappush(fringe, checkpoint)
                                     heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                     fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+    
+                    checkpoint = (currentpoint[0], currentpoint[1]-1) #Check the point directly above
+                    print("Up:{}".format(checkpoint))
+                    if ((currentpoint[0] is 0 and obstacles[currentpoint[0]][currentpoint[1] - 1] is 0) or (currentpoint[0] is len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0) or (currentpoint[0] is not 0 and currentpoint[0] is not len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0 and obstacles[currentpoint[0]][currentpoint[1] - 1] is 0)): #Check if path is clear
+                          if checkpoint not in closed: #Check if it is closed
+                                if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
+                                   g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
+                                   parent.update({checkpoint: None})
+                                if g.get(currentpoint) + 1 < g.get(checkpoint):
+                                    g.update({checkpoint: g.get(currentpoint)+ 1})
+                                    parent.update({checkpoint: currentpoint})
+                                    if fringeDict.get(checkpoint) is not None:
+                                        fringe.remove(checkpoint)
+                                    heappush(fringe, checkpoint)
+                                    heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
+                                    fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
 
-                      checkpoint = (currentpoint[0], currentpoint[1]-1) #Check the point directly above
-                      if (obstacles[currentpoint[0]][currentpoint[1]-1] == 0 or (currentpoint[0] - 1 >= 0 and obstacles[currentpoint[0]-1][currentpoint[1]-1]) == 0): #Check if path is clear
+                if (currentpoint[1] + 1 <= len(obstacles)): #Check the points below the current point
+                    if (currentpoint[0] - 1 >= 0): #Check point diagonally down left
+                        checkpoint = (currentpoint[0]-1, currentpoint[1]+1)
+                        print("Down Left:{}".format(checkpoint))
+                        if (obstacles[currentpoint[0]-1][currentpoint[1]] == 0): #Check if path is clear
                             if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
@@ -123,16 +157,80 @@ class Grid:
                                     heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
                                     fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
 
-                if (currentpoint[1] + 1 <= len(obstacles)): #Check the points below the current point
-                    if (currentpoint[0] - 1 >= 0): #Check point diagonally down left
-                        
+                    if (currentpoint[0] + 1 <= len(obstacles[0])): #Check point diagonally down right
+                        checkpoint = (currentpoint[0]+1, currentpoint[1]+1)
+                        print("Down Right:{}".format(checkpoint))
+                        if (obstacles[currentpoint[0]][currentpoint[1]] == 0): #Check if path is clear
+                            if checkpoint not in closed: #Check if it is closed
+                                if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
+                                    g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
+                                    parent.update({checkpoint: None})
+                                if g.get(currentpoint) + math.sqrt(2) < g.get(checkpoint):
+                                    g.update({checkpoint: g.get(currentpoint)+math.sqrt(2)})
+                                    parent.update({checkpoint: currentpoint})
+                                    if fringeDict.get(checkpoint) is not None:
+                                        fringe.remove(checkpoint)
+                                    heappush(fringe, checkpoint)
+                                    heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
+                                    fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                    
+                    checkpoint = (currentpoint[0], currentpoint[1]+1) #Check the point directly below
+                    print("Down:{}".format(checkpoint))
+                    if ((currentpoint[0] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0) or (currentpoint[0] is len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]] is 0) or (currentpoint[0] is not 0 and currentpoint[0] is not len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0)): #Check if path is clear
+                        if checkpoint not in closed: #Check if it is closed
+                            if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
+                                g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
+                                parent.update({checkpoint: None})
+                            if g.get(currentpoint) + 1 < g.get(checkpoint):
+                                g.update({checkpoint: g.get(currentpoint) + 1})
+                                parent.update({checkpoint: currentpoint})
+                                if fringeDict.get(checkpoint) is not None:
+                                    fringe.remove(checkpoint)
+                                heappush(fringe, checkpoint)
+                                heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
+                                fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+
+                    checkpoint = (currentpoint[0]-1, currentpoint[1]) #Check the point to the left
+                    print("Left:{}".format(checkpoint))
+                    if currentpoint[0] - 1 >= 0:
+                        if ((currentpoint[1] is 0 and obstacles[currentpoint[0]-1][currentpoint[1]] is 0) or (currentpoint[1] is len(obstacles) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0) or (currentpoint[1] is not 0 and currentpoint[1] is not len(obstacles) and obstacles[currentpoint[0]-1][currentpoint[1]] is 0 and obstacles[currentpoint[0]-1][currentpoint[1]] is 0)):
+                          if checkpoint not in closed: #Check if it is closed
+                            if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
+                                g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
+                                parent.update({checkpoint: None})
+                            if g.get(currentpoint) + 1 < g.get(checkpoint):
+                                g.update({checkpoint: g.get(currentpoint) + 1})
+                                parent.update({checkpoint: currentpoint})
+                                if fringeDict.get(checkpoint) is not None:
+                                    fringe.remove(checkpoint)
+                                heappush(fringe, checkpoint)
+                                heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
+                                fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+                    
+                    checkpoint = (currentpoint[0], currentpoint[1] + 1) #Check the point to the right
+                    print("Right:{}".format(checkpoint))
+                    if currentpoint[0] + 1 <= len(obstacles[0]):
+                        if ((currentpoint[1] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0) or (currentpoint[1] is len(obstacles) and obstacles[currentpoint[0]][currentpoint[1]-1] is 0) or (currentpoint[1] is not 0 and currentpoint[1] is not len(obstacles) and obstacles[currentpoint[0]][currentpoint[1]] is 0 and obstacles[currentpoint[0]][currentpoint[1]-1] is 0)):
+                          if checkpoint not in closed: #Check if it is closed
+                            if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
+                                g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
+                                parent.update({checkpoint: None})
+                            if g.get(currentpoint) + 1 < g.get(checkpoint):
+                                g.update({checkpoint: g.get(currentpoint) + 1})
+                                parent.update({checkpoint: currentpoint})
+                                if fringeDict.get(checkpoint) is not None:
+                                    fringe.remove(checkpoint)
+                                heappush(fringe, checkpoint)
+                                heuristic.update({checkpoint: self.a_Star_Heuristic(checkpoint,endpoint)})
+                                fringeDict.update({checkpoint: g.get(checkpoint) + heuristic.get(checkpoint)})
+
+        
 
  
     #Comparitive method to use in binary heap
     #Allows pairs to be placed in the heap and compared by their value in the fringe
     def __lt__(self, other):
         return fringeDict.get(self) > fringeDict.get(other)
-
     
 
 def main():
