@@ -5,7 +5,7 @@ import numpy
 import random
 import math
 
-#Create global dictionaries for fringe and closed points
+#Create global variables
 fringeDict = {}
 closed = set()
 startpoint = ()
@@ -32,8 +32,8 @@ class Grid:
             obstacles[wall[0]][wall[1]] = 1
             
         #Chooses random placements for start and end, 0 to 150 inclusive
-        startpoint = (3,4) #(random.randint(0,rows), random.randint(0,cols))
-        endpoint = (3,1) #(random.randint(0,rows), random.randint(0,cols))
+        startpoint = (random.randint(0,rows), random.randint(0,cols))
+        endpoint = (random.randint(0,rows), random.randint(0,cols))
         
     #Computes heuristic for A*
     def a_Star_Heuristic(self, currentPoint, endPoint):
@@ -53,10 +53,6 @@ class Grid:
         
         #g is used to notate the distance from start to point
         g = {}
-
-	      #fringe holds the next node to visit based off of f
-	      #f is g + heuristic
-        f = {}
 
         fringe = []
         heapify(fringe)
@@ -84,19 +80,13 @@ class Grid:
                     lst.insert(0,parent.get(point))
                     point = parent.get(point)
                 for x in lst:
-                        print(x)
-                for key,value in fringeDict.items():
-                        print(key,value)
-                print("heuristic")
-                for key1,value1 in heuristic.items():
-                        print(key1,value1)
+                    print(x)
                 return "Path found"
             else:
                 closed.add(currentpoint)
                 if (currentpoint[1] - 1 >= 0): #Check the points to the left of the current point
                     if (currentpoint[0] - 1 >= 0): #Check point diagonally up left
                         checkpoint = (currentpoint[0]-1, currentpoint[1]-1)
-                        print("Up Left:{}".format(checkpoint))
                         if (obstacles[currentpoint[0]-1][currentpoint[1]-1] == 0): #Check if path is clear
                             if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
@@ -116,7 +106,6 @@ class Grid:
 
                     if (currentpoint[0] + 1) <= len(obstacles): #Check the point diagonally down left
                       checkpoint = (currentpoint[0]+1, currentpoint[1]-1)
-                      print("Down Left:{}".format(checkpoint))
                       if (obstacles[currentpoint[0]][currentpoint[1]-1] == 0): #Check if path is clear
                             if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
@@ -134,8 +123,7 @@ class Grid:
                                     heappush(fringe, checkpoint)
     
                     checkpoint = (currentpoint[0], currentpoint[1]-1) #Check the point to the left
-                    print("Left:{}".format(checkpoint))
-                    if ((currentpoint[0] is 0 and obstacles[currentpoint[0]][currentpoint[1] - 1] is 0) or (currentpoint[0] is len(obstacles) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0) or (currentpoint[0] is not 0 and currentpoint[0] is not len(obstacles) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0 and obstacles[currentpoint[0]][currentpoint[1] - 1] is 0)): #Check if path is clear
+                    if ((currentpoint[0] is 0 and obstacles[currentpoint[0]][currentpoint[1] - 1] is 0) or (currentpoint[0] is len(obstacles) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0) or (currentpoint[0] is not 0 and currentpoint[0] is not len(obstacles) and (obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0 or obstacles[currentpoint[0]][currentpoint[1] - 1] is 0))): #Check if path is clear
                           if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
                                    g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
@@ -154,7 +142,6 @@ class Grid:
                 if (currentpoint[1] + 1 <= len(obstacles)): #Check the points to the right of the current point
                     if (currentpoint[0] - 1 >= 0): #Check point diagonally up right
                         checkpoint = (currentpoint[0]-1, currentpoint[1]+1)
-                        print("Up Right:{}".format(checkpoint))
                         if (obstacles[currentpoint[0]-1][currentpoint[1]] == 0): #Check if path is clear
                             if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
@@ -173,7 +160,6 @@ class Grid:
 
                     if (currentpoint[0] + 1 <= len(obstacles)): #Check point diagonally down right
                         checkpoint = (currentpoint[0]+1, currentpoint[1]+1)
-                        print("Down Right:{}".format(checkpoint))
                         if (obstacles[currentpoint[0]][currentpoint[1]] == 0): #Check if path is clear
                             if checkpoint not in closed: #Check if it is closed
                                 if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
@@ -191,8 +177,7 @@ class Grid:
                                     heappush(fringe, checkpoint)
                     
                     checkpoint = (currentpoint[0], currentpoint[1]+1) #Check the point to the right
-                    print("Right:{}".format(checkpoint))
-                    if ((currentpoint[0] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0) or (currentpoint[0] is len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]] is 0) or (currentpoint[0] is not 0 and currentpoint[0] is not len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0)): #Check if path is clear
+                    if ((currentpoint[0] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0) or (currentpoint[0] is len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]] is 0) or (currentpoint[0] is not 0 and currentpoint[0] is not len(obstacles[0]) and (obstacles[currentpoint[0]-1][currentpoint[1]] is 0 or obstacles[currentpoint[0]][currentpoint[1]] is 0))): #Check if path is clear
                         if checkpoint not in closed: #Check if it is closed
                             if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
                                 g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
@@ -209,9 +194,8 @@ class Grid:
                                 heappush(fringe, checkpoint)
 
                     checkpoint = (currentpoint[0]-1, currentpoint[1]) #Check the point above
-                    print("Up:{}".format(checkpoint))
                     if currentpoint[0] - 1 >= 0:
-                        if ((currentpoint[1] is 0 and obstacles[currentpoint[0]-1][currentpoint[1]] is 0) or (currentpoint[1] is len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0) or (currentpoint[1] is not 0 and currentpoint[1] is not len(obstacles) and obstacles[currentpoint[0]-1][currentpoint[1]] is 0 and obstacles[currentpoint[0]-1][currentpoint[1]] is 0)):
+                        if ((currentpoint[1] is 0 and obstacles[currentpoint[0]-1][currentpoint[1]] is 0) or (currentpoint[1] is len(obstacles[0]) and obstacles[currentpoint[0]-1][currentpoint[1]-1] is 0) or (currentpoint[1] is not 0 and currentpoint[1] is not len(obstacles) and (obstacles[currentpoint[0]-1][currentpoint[1]] is 0 or obstacles[currentpoint[0]-1][currentpoint[1]] is 0))):
                           if checkpoint not in closed: #Check if it is closed
                             if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
                                 g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
@@ -227,10 +211,9 @@ class Grid:
                                 checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
                                 heappush(fringe, checkpoint)
                     
-                    checkpoint = (currentpoint[0], currentpoint[1] + 1) #Check the point to the bottom
-                    print("Right:{}".format(checkpoint))
-                    if currentpoint[0] + 1 <= len(obstacles[0]):
-                        if ((currentpoint[1] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0) or (currentpoint[1] is len(obstacles[0]) and obstacles[currentpoint[0]][currentpoint[1]-1] is 0) or (currentpoint[1] is not 0 and currentpoint[1] is not len(obstacles) and obstacles[currentpoint[0]][currentpoint[1]] is 0 and obstacles[currentpoint[0]][currentpoint[1]-1] is 0)):
+                    checkpoint = (currentpoint[0] + 1, currentpoint[1]) #Check the point to the bottom
+                    if currentpoint[0] + 1 <= len(obstacles):
+                        if ((currentpoint[1] is 0 and obstacles[currentpoint[0]][currentpoint[1]] is 0) or (currentpoint[1] is len(obstacles[0]) and obstacles[currentpoint[0]][currentpoint[1]-1] is 0) or (currentpoint[1] is not 0 and currentpoint[1] is not len(obstacles) and (obstacles[currentpoint[0]][currentpoint[1]] is 0 or obstacles[currentpoint[0]][currentpoint[1]-1] is 0))):
                           if checkpoint not in closed: #Check if it is closed
                             if fringeDict.get(checkpoint) is None: # Check if the point is in fringe already
                                 g.update({checkpoint: numpy.inf}) # If not in fringe, add it to the fringe
