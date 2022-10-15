@@ -89,7 +89,7 @@ class CellGrid(Canvas):
         print(startpt)
         print("End: ")
         print(endpt)
-        self.a_Star(startpt, endpt)
+        self.a_Star(startpt, endpt, cellSize)
 
     def draw(self):
         for row in self.grid:
@@ -121,9 +121,9 @@ class CellGrid(Canvas):
             goalcol = randint(0, columnNumber - 1)
 
             startcol = 25
-            startrow = 0
+            startrow = 25
             goalcol = 75
-            goalrow = 0
+            goalrow = 25
 
             for col in range(startcol, goalcol):
                 pathblocked = True
@@ -155,7 +155,7 @@ class CellGrid(Canvas):
         h = diagonal + cardinal
         return h
 
-    def a_Star(self, startpoint, endpoint):
+    def a_Star(self, startpoint, endpoint, size):
         global fringe
         global closed
         # Sets up the heuristic for all points
@@ -197,6 +197,9 @@ class CellGrid(Canvas):
                 while (parent.get(point) is not startpoint):
                     lst.insert(0, parent.get(point))
                     point = parent.get(point)
+                self.create_line(10,40,20,50)
+                for i in range(len(lst)-1):
+                    self.create_line(lst[i][1]*size, lst[i][0]*size, lst[i+1][1]*size, lst[i+1][0]*size, width = 3, fill='blue')
                 for x in lst:
                     print(x)
                 for key, value in fringeDict.items():
