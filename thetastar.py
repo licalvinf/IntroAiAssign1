@@ -148,7 +148,6 @@ def theta_star(window, start, goal, nodes, edges):
                     cost_so_far[end] = float('inf')
                     parent[end] = None
                 update_vertex(s, end, cost_so_far, parent, nodes, edge, fringe, goal)
-                window.draw_line(s, end)
 
     if len(answer) == 0:
         print("No path found")

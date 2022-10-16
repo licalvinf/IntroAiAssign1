@@ -151,17 +151,18 @@ class display():
         self.reset_grid()
         start_time = time.time()
         res = astar.a_star(self, self.graph.src, self.graph.dst, self.graph.nodes, self.graph.edges)
-        print("Time: " + str(time.time() - start_time) + " seconds")
+        ti = str(time.time() - start_time)
+        print("Time: " + ti + " seconds")
         res.reverse()
-        print(res)
-        self.draw_path(res)
+        
 
     def __do_theta_star(self):
         print("Doing Theta*")
         self.reset_grid()
         start_time = time.time()
         res = thetastar.theta_star(self, self.graph.src, self.graph.dst, self.graph.nodes, self.graph.edges)
-        print("Time: " + str(time.time() - start_time) + " seconds")
+        ti = str(time.time() - start_time)
+        print("time:" + ti + " s")
         res.reverse()
         self.draw_path(res)
 
@@ -172,7 +173,6 @@ class display():
             p2 = path[i + 1]
             self.jobs.append(self.c.after(self.delay, self.__draw_line, p1, p2, 'red', 3))
             self.delay += display.show_delay
-            #self.c.create_line([(scale(p1[0]), scale(p1[1])), (scale(p2[0]), scale(p2[1]))], fill='red', width=3)
         self.c.after(self.delay, self.__raise_all)
     def draw_graph(self):
 

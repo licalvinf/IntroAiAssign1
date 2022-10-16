@@ -19,7 +19,7 @@ def update_vertex(s, e, nodes, cost_so_far, parent, edge: Edge, fringe: Priority
         fringe.put((cost_so_far[e] + nodes[e[0]][e[1]].h, e))
 
 def a_star(window, start, goal, nodes, edges):
-    # [(f, (x, y))]
+    # [(f, (x, y))] 
     fringe = PriorityQueue() 
     cost_so_far = dict()
     parent = dict()
@@ -29,7 +29,7 @@ def a_star(window, start, goal, nodes, edges):
     parent[start] = start
     fringe.put((0, start))
 
-    # Find h values
+    # Updates H values for node
     for i in range(len(nodes)):
         for j in range(len(nodes[i])):
             nodes[i][j].closed = False
@@ -90,7 +90,7 @@ def a_star(window, start, goal, nodes, edges):
                     cost_so_far[end] = float('inf')
                     parent[end] = None
                 update_vertex(s, end, nodes, cost_so_far, parent, edge, fringe, goal)
-                window.draw_line(s, end)
+                
 
     if len(sol) == 0:
         print("No path found")
