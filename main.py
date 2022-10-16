@@ -1,3 +1,4 @@
+import time
 from random import randint
 from tkinter import *
 from tkinter import ttk
@@ -26,6 +27,7 @@ if inputfile is "":
     grid = gridbuilder.CellGrid(root, numrows, numcols, cellsize, None)
 else:
     grid = gridbuilder.CellGrid(root, numrows, numcols, cellsize, inputfile)
+
 
 
 
