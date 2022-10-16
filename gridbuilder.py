@@ -1,3 +1,4 @@
+import time
 from tkinter import *
 from random import sample, randint
 from math import floor
@@ -11,6 +12,8 @@ closed = set()
 startpoint = ()
 endpoint = ()
 grid = []
+heuristic = {}
+g = {}
 
 
 class Cell():
@@ -48,7 +51,6 @@ class Cell():
 class CellGrid(Canvas):
     def __init__(self, master, rowNumber, columnNumber, cellSize, file, *args, **kwargs):
         Canvas.__init__(self, master, width=cellSize * columnNumber, height=cellSize * rowNumber, *args, **kwargs)
-
         self.cellSize = cellSize
 
         self.grid = []
@@ -130,10 +132,22 @@ class CellGrid(Canvas):
     def handleMouseClick(self, event):
         row, column = self._eventCoords(event)
         cell = self.grid[row][column]
-        print('vertex: (' + str(cell.abs) + ", " + str(cell.ord) + ")")
-        print('vertex: (' + str(cell.abs + 1) + ", " + str(cell.ord) + ")")
-        print('vertex: (' + str(cell.abs) + ", " + str(cell.ord + 1) + ")")
-        print('vertex: (' + str(cell.abs + 1) + ", " + str(cell.ord + 1) + ")")
+        print('vertex: (' + str(cell.ord) + ", " + str(cell.abs) + ")")
+        print("h: " + str(heuristic[(cell.ord,cell.abs)]))
+        print("g: " + str(g[(cell.ord,cell.abs)]))
+        print("f: " + str(heuristic[(cell.ord,cell.abs)] + g[(cell.ord,cell.abs)]))
+        print('vertex: (' + str(cell.ord + 1) + ", " + str(cell.abs) + ")")
+        print("h: " + str(heuristic[(cell.ord + 1, cell.abs)]))
+        print("g: " + str(g[(cell.ord + 1,cell.abs)]))
+        print("f: " + str(heuristic[(cell.ord + 1,cell.abs)] + g[(cell.ord + 1,cell.abs)]))
+        print('vertex: (' + str(cell.ord) + ", " + str(cell.abs + 1) + ")")
+        print("h: " + str(heuristic[(cell.ord, cell.abs+ 1)]))
+        print("g: " + str(g[(cell.ord,cell.abs+1)]))
+        print("f: " + str(heuristic[(cell.ord,cell.abs+1)] + g[(cell.ord,cell.abs+1)]))
+        print('vertex: (' + str(cell.ord + 1) + ", " + str(cell.abs + 1) + ")")
+        print("h: " + str(heuristic[(cell.ord+1, cell.abs+1)]))
+        print("g: " + str(g[(cell.ord+1,cell.abs+1)]))
+        print("f: " + str(heuristic[(cell.ord+1,cell.abs+1)] + g[(cell.ord+1,cell.abs+1)]))
 
     def pointmaker(self, rows, cols, size):
         rowNumber = rows
@@ -146,10 +160,10 @@ class CellGrid(Canvas):
             goalrow = randint(0, rowNumber - 1)
             goalcol = randint(0, columnNumber - 1)
 
-            startcol = 25
-            startrow = 25
-            goalcol = 75
-            goalrow = 25
+            #startcol = 25
+            #startrow = 25
+            #goalcol = 75
+            #goalrow = 25
 
             for col in range(startcol, goalcol):
                 pathblocked = True
@@ -182,16 +196,17 @@ class CellGrid(Canvas):
         return h
 
     def a_Star(self, startpoint, endpoint, size):
+        starttime = time.time()
         global fringe
         global closed
         # Sets up the heuristic for all points
-        heuristic = {}
+
 
         # Sets up array of tuples to track parents
         parent = {}
 
         # g is used to notate the distance from start to point
-        g = {}
+
 
         # fringe holds the next node to visit based off of f
         # f is g + heuristic
@@ -232,6 +247,9 @@ class CellGrid(Canvas):
                 print("heuristic")
                 for key1, value1 in heuristic.items():
                     print(key1, value1)
+                endtime = time.time()
+                totaltime = endtime-starttime
+                print("Total time: " + str(totaltime))
                 return "Path found"
             else:
                 closed.add(currentpoint)
@@ -281,8 +299,8 @@ class CellGrid(Canvas):
                             currentpoint[0] is len(self.grid) and self.grid[currentpoint[0] - 1][
                         currentpoint[1] - 1].fill is False) or (
                             currentpoint[0] is not 0 and currentpoint[0] is not len(self.grid) and
-                            self.grid[currentpoint[0] - 1][currentpoint[1] - 1] is False and self.grid[currentpoint[0]][
-                                currentpoint[1] - 1] is False)):  # Check if path is clear
+                            self.grid[currentpoint[0] - 1][currentpoint[1] - 1].fill is False and self.grid[currentpoint[0]][
+                                currentpoint[1] - 1].fill is False)):  # Check if path is clear
                         if checkpoint not in closed:  # Check if it is closed
                             if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                 g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -341,7 +359,7 @@ class CellGrid(Canvas):
                     print("Right:{}".format(checkpoint))
                     if ((currentpoint[0] is 0 and self.grid[currentpoint[0]][currentpoint[1]].fill is False) or (
                             currentpoint[0] is len(self.grid) and self.grid[currentpoint[0] - 1][
-                        currentpoint[1]] is False) or (
+                        currentpoint[1]].fill is False) or (
                             currentpoint[0] is not 0 and currentpoint[0] is not len(self.grid) and
                             self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False and
                             self.grid[currentpoint[0]][
@@ -387,9 +405,9 @@ class CellGrid(Canvas):
                                     heappush(fringe, checkpoint)
 
                     checkpoint = (currentpoint[0], currentpoint[1] + 1)  # Check the point to the bottom
-                    print("Right:{}".format(checkpoint))
+                    print("Down:{}".format(checkpoint))
                     if currentpoint[0] + 1 <= len(self.grid):
-                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0]][currentpoint[1]] is False) or (currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0]][currentpoint[1]-1] is False) or (currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and (self.grid[currentpoint[0]][currentpoint[1]] is False or self.grid[currentpoint[0]][currentpoint[1]-1] is False))):
+                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0]][currentpoint[1]].fill is False) or (currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0]][currentpoint[1]-1].fill is False) or (currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and (self.grid[currentpoint[0]][currentpoint[1]].fill is False or self.grid[currentpoint[0]][currentpoint[1]-1].fill is False))):
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
