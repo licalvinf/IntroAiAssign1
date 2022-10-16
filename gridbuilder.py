@@ -388,14 +388,8 @@ class CellGrid(Canvas):
 
                     checkpoint = (currentpoint[0], currentpoint[1] + 1)  # Check the point to the bottom
                     print("Right:{}".format(checkpoint))
-                    if currentpoint[0] + 1 <= len(self.grid[0]):
-                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0]][currentpoint[1]].fill is False) or (
-                                currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0]][
-                            currentpoint[1] - 1].fill is False) or (
-                                currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and
-                                self.grid[currentpoint[0]][currentpoint[1]].fill is False and
-                                self.grid[currentpoint[0]][
-                                    currentpoint[1] - 1].fill is False)):
+                    if currentpoint[0] + 1 <= len(self.grid):
+                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0]][currentpoint[1]] is False) or (currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0]][currentpoint[1]-1] is False) or (currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and (self.grid[currentpoint[0]][currentpoint[1]] is False or self.grid[currentpoint[0]][currentpoint[1]-1] is False))):
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
