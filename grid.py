@@ -230,7 +230,7 @@ class Grid:
                                 heappush(fringe, checkpoint)
 
 def main():
-    grid = Grid(5,5)
+    grid = Grid(5,10)
     grid.a_Star()
 
 if __name__ == "__main__":
