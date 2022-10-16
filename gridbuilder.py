@@ -89,7 +89,7 @@ class CellGrid(Canvas):
         print(startpt)
         print("End: ")
         print(endpt)
-        self.a_Star(startpt, endpt)
+        self.a_Star(startpt, endpt, cellSize)
 
     def draw(self):
         for row in self.grid:
@@ -119,6 +119,11 @@ class CellGrid(Canvas):
             startcol = randint(0, columnNumber - 1)
             goalrow = randint(0, rowNumber - 1)
             goalcol = randint(0, columnNumber - 1)
+
+            startcol = 25
+            startrow = 25
+            goalcol = 75
+            goalrow = 25
 
             for col in range(startcol, goalcol):
                 pathblocked = True
@@ -150,7 +155,7 @@ class CellGrid(Canvas):
         h = diagonal + cardinal
         return h
 
-    def a_Star(self, startpoint, endpoint):
+    def a_Star(self, startpoint, endpoint, size):
         global fringe
         global closed
         # Sets up the heuristic for all points
@@ -175,6 +180,11 @@ class CellGrid(Canvas):
         heuristic.update({startpoint: h})
         fringeDict.update({startpoint: g.get(startpoint) + heuristic.get(startpoint)})
         heappush(fringe, (fringeDict.get(startpoint), startpoint[0], startpoint[1]))
+        print(startpoint)
+        print(endpoint)
+        print(len(self.grid))
+
+        print(len(self.grid[0]))
         fringeDict.update({startpoint: g.get(startpoint) + heuristic.get(startpoint)})
         while (len(fringe) is not 0):
             currentpoint = heappop(fringe)
@@ -187,6 +197,9 @@ class CellGrid(Canvas):
                 while (parent.get(point) is not startpoint):
                     lst.insert(0, parent.get(point))
                     point = parent.get(point)
+                self.create_line(10,40,20,50)
+                for i in range(len(lst)-1):
+                    self.create_line(lst[i][1]*size, lst[i][0]*size, lst[i+1][1]*size, lst[i+1][0]*size, width = 3, fill='blue')
                 for x in lst:
                     print(x)
                 for key, value in fringeDict.items():
@@ -201,8 +214,7 @@ class CellGrid(Canvas):
                     if (currentpoint[0] - 1 >= 0):  # Check point diagonally up left
                         checkpoint = (currentpoint[0] - 1, currentpoint[1] - 1)
                         print("Up Left:{}".format(checkpoint))
-
-                        if self.grid[currentpoint[0] - 1][currentpoint[1] - 1].fill is False:  # Check if path is clear
+                        if (self.grid[currentpoint[0] - 1][currentpoint[1] - 1].fill is False):  # Check if path is clear
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -221,7 +233,7 @@ class CellGrid(Canvas):
                     if (currentpoint[0] + 1) <= len(self.grid):  # Check the point diagonally down left
                         checkpoint = (currentpoint[0] + 1, currentpoint[1] - 1)
                         print("Down Left:{}".format(checkpoint))
-                        if self.grid[currentpoint[0]][currentpoint[1] - 1].fill is False:  # Check if path is clear
+                        if (self.grid[currentpoint[0]][currentpoint[1] - 1].fill is False):  # Check if path is clear
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -241,7 +253,7 @@ class CellGrid(Canvas):
                     print("Left:{}".format(checkpoint))
                     if ((currentpoint[0] is 0 and self.grid[currentpoint[0]][currentpoint[1] - 1].fill is False) or (
                             currentpoint[0] is len(self.grid) and self.grid[currentpoint[0] - 1][
-                        currentpoint[1] - 1] is False) or (
+                        currentpoint[1] - 1].fill is False) or (
                             currentpoint[0] is not 0 and currentpoint[0] is not len(self.grid) and
                             self.grid[currentpoint[0] - 1][currentpoint[1] - 1] is False and self.grid[currentpoint[0]][
                                 currentpoint[1] - 1] is False)):  # Check if path is clear
@@ -260,11 +272,11 @@ class CellGrid(Canvas):
                                 checkpoint = (fringeDict.get(checkpoint), checkpoint[0], checkpoint[1])
                                 heappush(fringe, checkpoint)
 
-                if (currentpoint[1] + 1 <= len(self.grid)):  # Check the points to the right of the current point
+                if (currentpoint[1] + 1 <= len(self.grid[0])):  # Check the points to the right of the current point
                     if (currentpoint[0] - 1 >= 0):  # Check point diagonally up right
                         checkpoint = (currentpoint[0] - 1, currentpoint[1] + 1)
                         print("Up Right:{}".format(checkpoint))
-                        if (self.grid[currentpoint[0] - 1][currentpoint[1]] is False):  # Check if path is clear
+                        if (self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False):  # Check if path is clear
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -283,7 +295,7 @@ class CellGrid(Canvas):
                     if (currentpoint[0] + 1 <= len(self.grid)):  # Check point diagonally down right
                         checkpoint = (currentpoint[0] + 1, currentpoint[1] + 1)
                         print("Down Right:{}".format(checkpoint))
-                        if (self.grid[currentpoint[0]][currentpoint[1]] is False):  # Check if path is clear
+                        if (self.grid[currentpoint[0]][currentpoint[1]].fill is False):  # Check if path is clear
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -301,12 +313,12 @@ class CellGrid(Canvas):
 
                     checkpoint = (currentpoint[0], currentpoint[1] + 1)  # Check the point to the right
                     print("Right:{}".format(checkpoint))
-                    if ((currentpoint[0] is 0 and self.grid[currentpoint[0]][currentpoint[1]] is False) or (
-                            currentpoint[0] is len(self.grid[0]) and grid[currentpoint[0] - 1][
+                    if ((currentpoint[0] is 0 and self.grid[currentpoint[0]][currentpoint[1]].fill is False) or (
+                            currentpoint[0] is len(self.grid) and self.grid[currentpoint[0] - 1][
                         currentpoint[1]] is False) or (
-                            currentpoint[0] is not 0 and currentpoint[0] is not len(self.grid[0]) and
-                            self.grid[currentpoint[0] - 1][currentpoint[1]] is False and se.fgrid[currentpoint[0]][
-                                currentpoint[1]] is False)):  # Check if path is clear
+                            currentpoint[0] is not 0 and currentpoint[0] is not len(self.grid) and
+                            self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False and self.grid[currentpoint[0]][
+                                currentpoint[1]].fill is False)):  # Check if path is clear
                         if checkpoint not in closed:  # Check if it is closed
                             if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                 g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -325,12 +337,12 @@ class CellGrid(Canvas):
                     checkpoint = (currentpoint[0] - 1, currentpoint[1])  # Check the point above
                     print("Up:{}".format(checkpoint))
                     if currentpoint[0] - 1 >= 0:
-                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0] - 1][currentpoint[1]] is False) or (
+                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False) or (
                                 currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0] - 1][
-                            currentpoint[1] - 1] is 0) or (
-                                currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid) and
-                                self.grid[currentpoint[0] - 1][currentpoint[1]] is 0 and self.grid[currentpoint[0] - 1][
-                                    currentpoint[1]] is False)):
+                            currentpoint[1] - 1].fill is False) or (
+                                currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and
+                                self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False and
+                                self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False)):
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -349,12 +361,12 @@ class CellGrid(Canvas):
                     checkpoint = (currentpoint[0], currentpoint[1] + 1)  # Check the point to the bottom
                     print("Right:{}".format(checkpoint))
                     if currentpoint[0] + 1 <= len(self.grid[0]):
-                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0]][currentpoint[1]] is False) or (
+                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0]][currentpoint[1]].fill is False) or (
                                 currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0]][
-                            currentpoint[1] - 1] is False) or (
-                                currentpoint[1] is not False and currentpoint[1] is not len(self.grid) and
-                                self.grid[currentpoint[0]][currentpoint[1]] is False and self.grid[currentpoint[0]][
-                                    currentpoint[1] - 1] is False)):
+                            currentpoint[1] - 1].fill is False) or (
+                                currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and
+                                self.grid[currentpoint[0]][currentpoint[1]].fill is False and self.grid[currentpoint[0]][
+                                    currentpoint[1] - 1].fill is False)):
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
