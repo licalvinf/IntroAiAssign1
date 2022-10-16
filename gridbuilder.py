@@ -46,50 +46,76 @@ class Cell():
 
 
 class CellGrid(Canvas):
-    def __init__(self, master, rowNumber, columnNumber, cellSize, *args, **kwargs):
+    def __init__(self, master, rowNumber, columnNumber, cellSize, file, *args, **kwargs):
         Canvas.__init__(self, master, width=cellSize * columnNumber, height=cellSize * rowNumber, *args, **kwargs)
 
         self.cellSize = cellSize
 
         self.grid = []
-        totalsize = rowNumber * columnNumber
-        celllist = list(range(0, totalsize))
-        filledcells = sample(celllist, floor(totalsize / 10))
-        listiter = 0
-        for row in range(rowNumber):
+        if file is None:
+            totalsize = rowNumber * columnNumber
+            celllist = list(range(0, totalsize))
+            filledcells = sample(celllist, floor(totalsize / 10))
+            listiter = 0
+            for row in range(rowNumber):
 
-            line = []
-            for column in range(columnNumber):
-                if listiter in filledcells:
-                    line.append(Cell(self, column, row, cellSize, True))
-                else:
+                line = []
+                for column in range(columnNumber):
+                    if listiter in filledcells:
+                        line.append(Cell(self, column, row, cellSize, True))
+                    else:
+                        line.append(Cell(self, column, row, cellSize, False))
+                    listiter += 1
+
+                self.grid.append(line)
+
+            # bind click action
+            self.bind("<Button-1>", self.handleMouseClick)
+            self.draw()
+
+            startendpts = self.pointmaker(rowNumber, columnNumber, 10)
+            startpt = (startendpts[0], startendpts[1])
+            endpt = (startendpts[2], startendpts[3])
+            self.a_Star(startpt, endpt, cellSize)
+        else:
+            griddata = open(file)
+            start = griddata.readline()
+            goal = griddata.readline()
+
+            sizedata = griddata.readline()
+            columnNumber = int(sizedata[0])
+            rowNumber = int(sizedata[2])
+            tiledata = griddata.readline()
+
+            for row in range(rowNumber):
+                line = []
+                for column in range(columnNumber):
                     line.append(Cell(self, column, row, cellSize, False))
-                listiter += 1
+                self.grid.append(line)
+            while tiledata:
+                if int(tiledata[4]) == 1:
+                    self.grid[int(tiledata[2]) - 1][int(tiledata[0]) - 1].fill = True
+                tiledata = griddata.readline()
 
-            self.grid.append(line)
+            self.bind("<Button-1>", self.handleMouseClick)
+            self.draw()
 
-        startx = randint(0, columnNumber - 1)
-        starty = randint(0, rowNumber - 1)
-        self.create_oval((startx * .5) * 50, (starty * 1.5) * 50, (startx * 1.5) * cellSize,
-                         (starty * .5) * cellSize, fill="blue")
+            self.create_oval((int(start[0]) - 1) * cellSize - 5, (int(start[2]) - 1) * cellSize + 5,
+                             (int(start[0]) - 1) * cellSize + 5,
+                             (int(start[2]) - 1) * cellSize - 5, fill="blue")
 
-        goalx = randint(0, columnNumber - 1)
-        goaly = randint(0, rowNumber - 1)
-        self.create_oval((goalx * .9) * cellSize, (goaly * 1.1) * cellSize, (goalx * 1.1) * cellSize,
-                         (goaly * .9) * cellSize, fill="red")
+            self.create_oval((int(goal[0]) - 1) * cellSize - 5, (int(goal[2]) - 1) * cellSize + 5,
+                             (int(goal[0]) - 1) * cellSize + 5,
+                             (int(goal[2]) - 1) * cellSize - 5, fill="red")
 
-        # bind click action
-        self.bind("<Button-1>", self.handleMouseClick)
-        self.draw()
+            startpt = ((int(start[2]) - 1), (int(start[0]) - 1))
+            endpt = ((int(goal[2]) - 1), (int(goal[0]) - 1))
 
-        startendpts = self.pointmaker(rowNumber, columnNumber, 10)
-        startpt = (startendpts[0], startendpts[1])
-        endpt = (startendpts[2], startendpts[3])
-        print("Start: ")
-        print(startpt)
-        print("End: ")
-        print(endpt)
-        self.a_Star(startpt, endpt, cellSize)
+            print("Start: ")
+            print(startpt)
+            print("End: ")
+            print(endpt)
+            self.a_Star(startpt, endpt, cellSize)
 
     def draw(self):
         for row in self.grid:
@@ -180,15 +206,13 @@ class CellGrid(Canvas):
         heuristic.update({startpoint: h})
         fringeDict.update({startpoint: g.get(startpoint) + heuristic.get(startpoint)})
         heappush(fringe, (fringeDict.get(startpoint), startpoint[0], startpoint[1]))
-        print(startpoint)
-        print(endpoint)
         print(len(self.grid))
-
         print(len(self.grid[0]))
         fringeDict.update({startpoint: g.get(startpoint) + heuristic.get(startpoint)})
         while (len(fringe) is not 0):
             currentpoint = heappop(fringe)
             currentpoint = (currentpoint[1], currentpoint[2])
+            print("Current point:")
             print(currentpoint)
             if (currentpoint == endpoint):
                 point = endpoint
@@ -197,9 +221,10 @@ class CellGrid(Canvas):
                 while (parent.get(point) is not startpoint):
                     lst.insert(0, parent.get(point))
                     point = parent.get(point)
-                self.create_line(10,40,20,50)
-                for i in range(len(lst)-1):
-                    self.create_line(lst[i][1]*size, lst[i][0]*size, lst[i+1][1]*size, lst[i+1][0]*size, width = 3, fill='blue')
+                self.create_line(10, 40, 20, 50)
+                for i in range(len(lst) - 1):
+                    self.create_line(lst[i][1] * size, lst[i][0] * size, lst[i + 1][1] * size, lst[i + 1][0] * size,
+                                     width=3, fill='blue')
                 for x in lst:
                     print(x)
                 for key, value in fringeDict.items():
@@ -214,7 +239,8 @@ class CellGrid(Canvas):
                     if (currentpoint[0] - 1 >= 0):  # Check point diagonally up left
                         checkpoint = (currentpoint[0] - 1, currentpoint[1] - 1)
                         print("Up Left:{}".format(checkpoint))
-                        if (self.grid[currentpoint[0] - 1][currentpoint[1] - 1].fill is False):  # Check if path is clear
+                        if (self.grid[currentpoint[0] - 1][
+                            currentpoint[1] - 1].fill is False):  # Check if path is clear
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
                                     g.update({checkpoint: numpy.inf})  # If not in fringe, add it to the fringe
@@ -317,7 +343,8 @@ class CellGrid(Canvas):
                             currentpoint[0] is len(self.grid) and self.grid[currentpoint[0] - 1][
                         currentpoint[1]] is False) or (
                             currentpoint[0] is not 0 and currentpoint[0] is not len(self.grid) and
-                            self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False and self.grid[currentpoint[0]][
+                            self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False and
+                            self.grid[currentpoint[0]][
                                 currentpoint[1]].fill is False)):  # Check if path is clear
                         if checkpoint not in closed:  # Check if it is closed
                             if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
@@ -337,7 +364,8 @@ class CellGrid(Canvas):
                     checkpoint = (currentpoint[0] - 1, currentpoint[1])  # Check the point above
                     print("Up:{}".format(checkpoint))
                     if currentpoint[0] - 1 >= 0:
-                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0] - 1][currentpoint[1]].fill is False) or (
+                        if ((currentpoint[1] is 0 and self.grid[currentpoint[0] - 1][
+                            currentpoint[1]].fill is False) or (
                                 currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0] - 1][
                             currentpoint[1] - 1].fill is False) or (
                                 currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and
@@ -365,7 +393,8 @@ class CellGrid(Canvas):
                                 currentpoint[1] is len(self.grid[0]) and self.grid[currentpoint[0]][
                             currentpoint[1] - 1].fill is False) or (
                                 currentpoint[1] is not 0 and currentpoint[1] is not len(self.grid[0]) and
-                                self.grid[currentpoint[0]][currentpoint[1]].fill is False and self.grid[currentpoint[0]][
+                                self.grid[currentpoint[0]][currentpoint[1]].fill is False and
+                                self.grid[currentpoint[0]][
                                     currentpoint[1] - 1].fill is False)):
                             if checkpoint not in closed:  # Check if it is closed
                                 if fringeDict.get(checkpoint) is None:  # Check if the point is in fringe already
