@@ -154,6 +154,7 @@ class display():
         ti = str(time.time() - start_time)
         print("Time: " + ti + " seconds")
         res.reverse()
+        self.draw_path(res)
         
 
     def __do_theta_star(self):
